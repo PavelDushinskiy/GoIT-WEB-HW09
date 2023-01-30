@@ -1,5 +1,5 @@
 from collections import UserDict
-
+from datetime import datetime
 import psycopg2
 
 from database.db import session
@@ -33,7 +33,7 @@ class RecordsContainer(UserDict):
                     for person_ in session.query(Person).all():
                         record = Record(person_.name)
                         record.name = person_.name
-                        record.birthday = person_.birthday
+                        record.birthday = person_.birthday.strftime(DATE_FORMAT)
                         record.address = person_.address
                         record.email = person_.email
                         for phone_ in session.query(Phone).filter(Phone.person_id == person_.id):
@@ -71,14 +71,14 @@ class RecordsContainer(UserDict):
             case 'contacts':
                 session.query(Person).delete()
                 session.query(Phone).delete()
-                session.execute("ALTER SEQUENCE persons_id_seq RESTART WITH 1")
-                session.execute("ALTER SEQUENCE phones_id_seq RESTART WITH 1")
+                # session.execute("ALTER SEQUENCE persons_id_seq RESTART WITH 1")
+                # session.execute("ALTER SEQUENCE phones_id_seq RESTART WITH 1")
                 session.commit()
 
                 for rec_id, record in enumerate(handler.data.values(), start=1):
                     db_person = Person(
                         name=record.name,
-                        birthday=record.birthday,
+                        birthday=datetime.strptime(record.birthday, DATE_FORMAT),
                         email=record.email,
                         address=record.address)
                     for rec in record.phones:
@@ -93,9 +93,9 @@ class RecordsContainer(UserDict):
                 session.query(Note).delete()
                 session.query(Tag).delete()
                 session.query(Notes2Tags).delete()
-                session.execute("ALTER SEQUENCE notes_id_seq RESTART WITH 1")
-                session.execute("ALTER SEQUENCE tags_id_seq RESTART WITH 1")
-                session.execute("ALTER SEQUENCE notes_to_tags_id_seq RESTART WITH 1")
+                # session.execute("ALTER SEQUENCE notes_id_seq RESTART WITH 1")
+                # session.execute("ALTER SEQUENCE tags_id_seq RESTART WITH 1")
+                # session.execute("ALTER SEQUENCE notes_to_tags_id_seq RESTART WITH 1")
                 session.commit()
                 for rec_id, note_record in enumerate(handler.data.values(), start=1):
                     db_note = Note(

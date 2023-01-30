@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql.schema import ForeignKey
 from sqlalchemy.sql.sqltypes import DateTime
 from sqlalchemy.orm import relationship
-
+from datetime import date
 
 from database.db import engine
 
@@ -32,7 +32,7 @@ class Note(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String(100), nullable=False)
     text = Column(String(1024), nullable=False)
-    created = Column(DateTime)
+    created = Column(DateTime, default=date.today().strftime("%Y.%m.%d"))
     tags = relationship('Tag', secondary='notes_to_tags', back_populates='notes')
 
 
